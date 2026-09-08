@@ -1,1 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sortscape | Data in Motion</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
+    :root {
+      --ink: #13212c;
+      --muted: #66747c;
+      --paper: #f6f5f0;
+      --cream: #fffdf8;
+      --line: #d9ded8;
+      --coral: #f06b52;
+      --coral-dark: #c34e3b;
+      --teal: #197d78;
+      --teal-soft: #dff1ea;
+      --yellow: #f4c95d;
+      --purple: #6b5b95;
+      --shadow: 0 18px 44px rgba(24, 42, 48, .09);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: 'Space Grotesk', sans-serif;
+      min-width: 320px;
+    }
+    button, select, input { font: inherit; }
+    button { cursor: pointer; }
+    .shell { max-width: 1440px; margin: 0 auto; padding: 26px 34px 48px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 19px; font-weight: 700; letter-spacing: -.03em; }
+    .brand-mark { width: 30px; height: 30px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; align-items: end; }
+    .brand-mark i { display: block; background: var(--coral); border-radius: 2px 2px 0 0; }
+    .brand-mark i:nth-child(1) { height: 48%; } .brand-mark i:nth-child(2) { height: 82%; background: var(--teal); } .brand-mark i:nth-child(3) { height: 64%; background: var(--yellow); }
+    .status { display: flex; align-items: center; gap: 8px; color: var(--muted); font: 12px 'DM Mono', monospace; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 4px var(--teal-soft); }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr); gap: 22px; margin-bottom: 24px; }
+    .hero-copy { padding: 35px 4px 22px; }
+    .eyebrow { color: var(--coral-dark); font: 500 11px 'DM Mono', monospace; letter-spacing: .13em; text-transform: uppercase; margin: 0 0 15px; }
+    h1 { font-size: clamp(42px, 6vw, 82px); line-height: .93; letter-spacing: -.075em; margin: 0 0 20px; max-width: 720px; }
+    .hero-copy p { margin: 0; max-width: 570px; color: var(--muted); font-size: 17px; line-height: 1.55; }
+    .hero-note { align-self: end; background: var(--ink); color: white; padding: 27px; border-radius: 4px; min-height: 168px; position: relative; overflow: hidden; }
+    .hero-note:after { content: ''; position: absolute; width: 180px; height: 180px; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; right: -65px; bottom: -93px; box-shadow: 0 0 0 19px rgba(255,255,255,.04), 0 0 0 39px rgba(255,255,255,.04); }
+    .hero-note strong { display: block; color: var(--yellow); font-size: 26px; letter-spacing: -.05em; margin-bottom: 10px; }
+    .hero-note span { position: relative; z-index: 1; display: block; max-width: 240px; color: #d9e4e1; font-size: 13px; line-height: 1.5; }
+    .tabs { display: flex; gap: 5px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+    .tab { border: 0; background: transparent; color: var(--muted); padding: 13px 16px; font-weight: 600; border-bottom: 3px solid transparent; }
+    .tab.active { color: var(--ink); border-color: var(--coral); }
+    .view { display: none; animation: rise .35s ease both; }
+    .view.active { display: block; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .control-strip { display: grid; grid-template-columns: 1.15fr 1fr 1fr 1.15fr auto auto; gap: 12px; padding: 14px; background: var(--cream); border: 1px solid var(--line); box-shadow: var(--shadow); margin-bottom: 20px; }
+    .control { min-width: 0; padding: 3px 10px; border-right: 1px solid var(--line); }
+    .control:last-of-type { border-right: 0; }
+    label { display: block; color: var(--muted); font: 10px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px; }
+    select, input[type='range'] { width: 100%; }
+    select { appearance: none; border: 0; background: transparent; color: var(--ink); font-weight: 600; padding: 2px 18px 2px 0; background-image: linear-gradient(45deg, transparent 50%, var(--coral) 50%), linear-gradient(135deg, var(--coral) 50%, transparent 50%); background-position: calc(100% - 9px) 8px, 100% 8px; background-size: 6px 6px; background-repeat: no-repeat; }
+    input[type='range'] { accent-color: var(--coral); }
+    .range-value { display: flex; justify-content: space-between; font: 11px 'DM Mono', monospace; color: var(--ink); }
+    .primary, .secondary { border: 0; border-radius: 3px; font-weight: 700; padding: 12px 19px; white-space: nowrap; }
+    .primary { background: var(--coral); color: white; box-shadow: 0 4px 0 var(--coral-dark); }
+    .primary:hover { background: var(--coral-dark); transform: translateY(1px); box-shadow: 0 2px 0 #963a2d; }
+    .primary:disabled { opacity: .5; cursor: wait; transform: none; box-shadow: none; }
+    .secondary { background: var(--teal-soft); color: var(--teal); }
+    .secondary:hover { background: #cae7de; }
+    .secondary:disabled { opacity: .45; cursor: not-allowed; }
+    .control-button { padding-inline: 14px; }
+    .lab-grid { display: grid; grid-template-columns: minmax(0, 1fr) 285px; gap: 20px; }
+    .visual-panel, .side-panel, .data-card, .learn-panel { background: var(--cream); border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .visual-panel { min-height: 510px; padding: 22px; display: flex; flex-direction: column; }
+    .panel-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 14px; }
+    .panel-head h2, .data-card h2, .learn-panel h2 { font-size: 18px; letter-spacing: -.04em; margin: 0; }
+    .panel-head p { color: var(--muted); margin: 5px 0 0; font-size: 12px; }
+    .run-state { color: var(--teal); font: 11px 'DM Mono', monospace; white-space: nowrap; }
+    .bars { display: flex; align-items: end; justify-content: center; gap: 3px; flex: 1; min-height: 320px; padding: 22px 8px 4px; border-bottom: 1px solid var(--line); background: repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(217,222,216,.42) 50px); }
+    .bar { flex: 1; max-width: 20px; min-width: 2px; background: var(--teal); border-radius: 2px 2px 0 0; transition: height .08s linear, background .1s ease; position: relative; }
+    .bar.active { background: var(--coral); }
+    .bar.sorted { background: var(--yellow); }
+    .bar.pivot { background: var(--purple); }
+    .sort-blocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(30px, 1fr)); gap: 6px; padding: 16px 0 4px; border-bottom: 1px solid var(--line); }
+    .sort-block { display: grid; place-items: center; height: 36px; border-radius: 3px; color: white; background: hsl(var(--block-hue), 65%, 48%); font: 11px 'DM Mono', monospace; transition: transform .15s, box-shadow .2s, background .2s; }
+    .sort-block.active { transform: translateY(-5px) scale(1.05); background: var(--coral); box-shadow: 0 0 16px rgba(240,107,82,.65); }
+    .sort-block.pivot { background: var(--purple); box-shadow: 0 0 14px rgba(107,91,149,.55); }
+    .sort-block.sorted { background: var(--yellow); color: var(--ink); box-shadow: 0 0 11px rgba(244,201,93,.7); }
+    .sort-block.complete { animation: settle-glow 1.3s ease-in-out infinite alternate; }
+    @keyframes settle-glow { from { box-shadow: 0 0 7px hsla(var(--block-hue), 80%, 55%, .35); } to { box-shadow: 0 0 19px hsla(var(--block-hue), 90%, 55%, .95); transform: translateY(-2px); } }
+    .sound-button { min-width: 108px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding-top: 17px; }
+    .metric strong { display: block; font: 500 22px 'DM Mono', monospace; letter-spacing: -.08em; }
+    .metric span { color: var(--muted); font: 10px 'DM Mono', monospace; text-transform: uppercase; }
+    .side-panel { padding: 20px; }
+    .side-panel h3 { margin: 0 0 17px; font-size: 14px; }
+    .algorithm-list { display: grid; gap: 8px; }
+    .algo { width: 100%; text-align: left; border: 1px solid var(--line); background: transparent; padding: 11px 12px; border-radius: 3px; color: var(--muted); }
+    .algo strong { display: block; color: var(--ink); font-size: 13px; margin-bottom: 3px; }
+    .algo small { font: 10px 'DM Mono', monospace; }
+    .algo.selected { border-color: var(--coral); background: #fff4ef; }
+    .side-divider { border: 0; border-top: 1px solid var(--line); margin: 22px 0; }
+    .legend { display: grid; gap: 10px; font-size: 12px; color: var(--muted); }
+    .legend span { display: flex; align-items: center; gap: 8px; }
+    .swatch { width: 10px; height: 10px; border-radius: 2px; background: var(--teal); } .swatch.coral { background: var(--coral); } .swatch.yellow { background: var(--yellow); } .swatch.purple { background: var(--purple); }
+    .insight-card { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .insight-card h3 { margin-bottom: 13px; }
+    .benchmark-button { width: 100%; margin-bottom: 14px; }
+    .history-list { display: grid; gap: 7px; }
+    .history-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 8px 9px; background: #f4f7f2; font: 10px 'DM Mono', monospace; color: var(--muted); }
+    .history-row strong { color: var(--ink); font-weight: 500; }
+    .history-empty { color: var(--muted); font: 10px 'DM Mono', monospace; }
+    .benchmark-panel { display: none; margin-top: 18px; padding: 18px 20px; background: #eef6f2; border: 1px solid #c8e3d8; }
+    .benchmark-panel.show { display: block; animation: rise .3s ease both; }
+    .benchmark-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .benchmark-head h3 { margin: 0; font-size: 15px; }
+    .benchmark-head span { color: var(--muted); font: 10px 'DM Mono', monospace; }
+    .benchmark-row { display: grid; grid-template-columns: 115px 1fr 56px; gap: 10px; align-items: center; margin-top: 8px; font: 10px 'DM Mono', monospace; }
+    .benchmark-track { height: 7px; background: rgba(25,125,120,.12); }
+    .benchmark-track i { display: block; height: 100%; background: var(--teal); transition: width .5s ease; }
+    .benchmark-row:first-of-type .benchmark-track i { background: var(--coral); }
+    .data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; }
+    .data-card { padding: 22px; min-height: 225px; }
+    .data-card .tag { color: var(--coral-dark); font: 10px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .1em; }
+    .data-card h2 { margin: 10px 0 10px; }
+    .data-card p { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0 0 18px; }
+    .mini-bars { height: 58px; display: flex; gap: 3px; align-items: end; }
+    .mini-bars i { flex: 1; background: var(--teal); border-radius: 2px 2px 0 0; }
+    .mini-bars i:nth-child(3n) { background: var(--coral); } .mini-bars i:nth-child(4n) { background: var(--yellow); }
+    .learn-layout { display: grid; grid-template-columns: minmax(0, 1fr) 350px; gap: 20px; }
+    .learn-panel { padding: 25px; }
+    .learn-panel h2 { font-size: 24px; margin: 6px 0 10px; }
+    .learn-panel > p { color: var(--muted); max-width: 600px; line-height: 1.55; font-size: 14px; }
+    .arena { margin: 25px 0 20px; padding: 23px; background: var(--ink); color: white; min-height: 390px; overflow: hidden; }
+    .arena-top { display: flex; justify-content: space-between; font: 11px 'DM Mono', monospace; color: #b5cbc5; margin-bottom: 20px; }
+    .brain-stage { position: relative; height: 235px; margin: 0 -7px 20px; border: 1px solid rgba(181,203,197,.18); background: radial-gradient(circle at 50% 50%, rgba(25,125,120,.18), transparent 55%), #102c35; overflow: hidden; }
+    .brain-stage:before { content: 'LIVE ACTIVATION MAP'; position: absolute; top: 12px; left: 14px; color: #8dafaa; font: 9px 'DM Mono', monospace; letter-spacing: .12em; }
+    .network-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .network-line { stroke: #3e6670; stroke-width: 1.2; opacity: .5; transition: stroke .3s, opacity .3s, stroke-width .3s; }
+    .network-line.lit { stroke: var(--yellow); opacity: .95; stroke-width: 2.8; filter: drop-shadow(0 0 4px rgba(244,201,93,.75)); }
+    .network-line.good { stroke: var(--teal); opacity: .9; }
+    .network-pulse { fill: var(--coral); opacity: 0; }
+    .network-pulse.fire { animation: travel 1s ease-out forwards; opacity: 1; }
+    @keyframes travel { 0% { offset-distance: 0%; opacity: 0; } 20% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+    .neuron { fill: #1d4852; stroke: #71a9a0; stroke-width: 1.5; transition: fill .3s, stroke .3s, filter .3s; }
+    .neuron.hot { fill: var(--coral); stroke: #ffd0a8; filter: drop-shadow(0 0 8px rgba(240,107,82,.8)); }
+    .neuron.goal { fill: var(--teal); stroke: #c3f2df; }
+    .network-label { fill: #8dafaa; font: 9px 'DM Mono', monospace; letter-spacing: .08em; }
+    .brain-caption { display: flex; justify-content: space-between; gap: 12px; color: #8dafaa; font: 10px 'DM Mono', monospace; }
+    .brain-caption strong { color: var(--yellow); font-weight: 400; }
+    .mission-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 10px; padding: 13px 14px; background: #fff7e6; border: 1px solid #ecdcae; margin: 20px 0 -8px; }
+    .mission-form label { color: var(--coral-dark); margin-bottom: 5px; }
+    .mission-input { width: 100%; border: 1px solid #d9c98e; background: #fffdf8; color: var(--ink); padding: 10px 11px; outline: 0; font: 13px 'DM Mono', monospace; }
+    .mission-input:focus { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(240,107,82,.12); }
+    .number-picker { display: flex; flex-wrap: wrap; gap: 6px; }
+    .number-choice { width: 34px; height: 34px; padding: 0; border: 1px solid #d9c98e; border-radius: 3px; background: var(--cream); color: var(--ink); font: 500 13px 'DM Mono', monospace; transition: transform .16s, background .16s, color .16s, border-color .16s; }
+    .number-choice:hover { transform: translateY(-2px); border-color: var(--coral); }
+    .number-choice.selected { background: var(--coral); border-color: var(--coral-dark); color: white; box-shadow: 0 3px 0 var(--coral-dark); transform: translateY(-2px); }
+    .selection-count { color: var(--coral-dark); font: 10px 'DM Mono', monospace; margin-top: 7px; }
+    .mission-hint { grid-column: 1 / -1; color: var(--muted); font: 10px 'DM Mono', monospace; }
+    .completion { display: none; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; margin-top: 16px; background: var(--teal-soft); color: var(--teal); border: 1px solid #b5ddcf; }
+    .completion.show { display: flex; animation: rise .4s ease both; }
+    .completion strong { font-size: 14px; }
+    .completion span { font: 10px 'DM Mono', monospace; }
+    .mission-error { color: var(--coral-dark); font: 10px 'DM Mono', monospace; min-height: 12px; }
+    .tiles { display: flex; gap: 8px; align-items: end; justify-content: center; height: 90px; }
+    .tile { width: clamp(42px, 10vw, 72px); aspect-ratio: 1; display: grid; place-items: center; border: 2px solid var(--teal); background: #21434b; color: var(--yellow); font: 24px 'DM Mono', monospace; transition: transform .2s, border-color .2s; }
+    .tile.hot { border-color: var(--coral); transform: translateY(-9px); }
+    .learn-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .episode-copy { font: 11px 'DM Mono', monospace; color: var(--muted); }
+    .score-card { padding: 25px; background: var(--teal-soft); border: 1px solid #c7e4d9; }
+    .score-card h3 { margin: 0 0 21px; font-size: 16px; }
+    .score-number { font: 500 48px 'DM Mono', monospace; letter-spacing: -.1em; color: var(--teal); }
+    .score-label { color: var(--muted); font-size: 12px; }
+    .progress { height: 8px; margin: 16px 0 24px; background: rgba(25,125,120,.15); } .progress i { display: block; height: 100%; width: 0%; background: var(--teal); transition: width .3s ease; }
+    .policy { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+    .policy i { display: grid; place-items: center; height: 30px; background: rgba(255,255,255,.65); color: var(--teal); font-style: normal; font: 10px 'DM Mono', monospace; }
+    .confidence-list { display: grid; gap: 9px; margin: 16px 0 24px; }
+    .confidence-row { display: grid; grid-template-columns: 68px 1fr 32px; align-items: center; gap: 7px; color: var(--muted); font: 10px 'DM Mono', monospace; }
+    .confidence-track { height: 6px; background: rgba(25,125,120,.14); }
+    .confidence-track i { display: block; height: 100%; width: 0; background: var(--coral); transition: width .35s ease, background .35s ease; }
+    .learning-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+    .learning-stat { padding: 10px; background: rgba(255,255,255,.54); }
+    .learning-stat strong { display: block; color: var(--teal); font: 15px 'DM Mono', monospace; }
+    .learning-stat span { color: var(--muted); font: 9px 'DM Mono', monospace; text-transform: uppercase; }
+    .footnote { margin-top: 28px; color: var(--muted); font: 10px 'DM Mono', monospace; text-align: center; }
+    @media (max-width: 980px) { .hero, .learn-layout { grid-template-columns: 1fr; } .hero-note { min-height: 130px; } .control-strip { grid-template-columns: repeat(2, 1fr); } .control { border-right: 0; } .control:last-child { grid-column: span 2; } .lab-grid { grid-template-columns: 1fr; } .side-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; } .side-divider { display: none; } }
+    @media (max-width: 650px) { .shell { padding: 18px 16px 35px; } .topbar { margin-bottom: 15px; } .hero-copy { padding-top: 22px; } h1 { font-size: 49px; } .tabs { overflow-x: auto; } .tab { white-space: nowrap; padding-inline: 11px; } .control-strip { grid-template-columns: 1fr; } .control:last-child { grid-column: auto; } .data-grid { grid-template-columns: 1fr; } .side-panel { display: block; } .side-divider { display: block; } .metrics { gap: 6px; } .metric strong { font-size: 17px; } .visual-panel { padding: 15px; } .mission-form { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark"><i></i><i></i><i></i></span> SORTSCAPE</div>
+      <div class="status"><span class="status-dot"></span> LOCAL PLAYGROUND / READY</div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Data in motion</p>
+        <h1>Make the messy<br>stuff make sense.</h1>
+        <p>A hands-on sorting laboratory for watching algorithms think, tuning the inputs, and teaching a tiny agent to find its own way through a pile of numbers.</p>
+      </div>
+      <aside class="hero-note"><strong>Three ways to play.</strong><span>Race an algorithm. Shape the data. Then watch a learner discover the rules one move at a time.</span></aside>
+    </section>
+
+    <nav class="tabs" aria-label="Main sections">
+      <button class="tab active" data-view="sort">01 / Sort lab</button>
+      <button class="tab" data-view="data">02 / Data gallery</button>
+      <button class="tab" data-view="learn">03 / Learning arena</button>
+    </nav>
+
+    <section class="view active" id="sort-view">
+      <div class="control-strip">
+        <div class="control"><label for="pattern">Data pattern</label><select id="pattern"><option value="random">Wild random</option><option value="nearly">Nearly sorted</option><option value="reverse">Backwards</option><option value="mountain">Mountain range</option><option value="duplicates">Lots of repeats</option></select></div>
+        <div class="control"><label for="size">Number of values</label><input id="size" type="range" min="12" max="72" value="42"><div class="range-value"><span>12</span><output id="size-output">42 values</output><span>72</span></div></div>
+        <div class="control"><label for="speed">Animation speed</label><input id="speed" type="range" min="1" max="5" value="3"><div class="range-value"><span>slow</span><output id="speed-output">steady</output><span>fast</span></div></div>
+        <div class="control"><label for="sort-select">Chosen algorithm</label><select id="sort-select"><option value="bubble">Bubble sort</option><option value="insertion">Insertion sort</option><option value="selection">Selection sort</option><option value="quick">Quick sort</option><option value="merge">Merge sort</option></select></div>
+        <button class="primary" id="run-button">Run the sort</button><button class="secondary control-button" id="pause-button" disabled>Pause</button><button class="secondary control-button" id="reset-button">New data</button><button class="secondary sound-button" id="sound-button" aria-pressed="true">Sound on</button>
+      </div>
+
+      <div class="lab-grid">
+        <section class="visual-panel">
+          <div class="panel-head"><div><h2 id="visual-title">Bubble sort is ready.</h2><p id="visual-copy" aria-live="polite">Choose your conditions, then let it work.</p></div><span class="run-state" id="run-state" aria-live="polite">IDLE</span></div>
+          <div class="bars" id="bars" aria-label="Sorting visualization"></div><div class="sort-blocks" id="sort-blocks" aria-label="Sorting blocks"></div>
+          <div class="metrics"><div class="metric"><strong id="metric-comparisons">0</strong><span>comparisons</span></div><div class="metric"><strong id="metric-swaps">0</strong><span>moves</span></div><div class="metric"><strong id="metric-time">0.0s</strong><span>elapsed</span></div><div class="metric"><strong id="metric-order">0%</strong><span>in order</span></div></div><div class="benchmark-panel" id="benchmark-panel"><div class="benchmark-head"><h3>Algorithm showdown</h3><span>same data / fewer moves wins</span></div><div id="benchmark-results"></div></div>
+        </section>
+        <aside class="side-panel"><div><h3>Pick a personality</h3><div class="algorithm-list"><button class="algo selected" data-algo="bubble"><strong>Bubble sort</strong><small>patient / thorough</small></button><button class="algo" data-algo="insertion"><strong>Insertion sort</strong><small>good with almost-order</small></button><button class="algo" data-algo="selection"><strong>Selection sort</strong><small>quietly decisive</small></button><button class="algo" data-algo="quick"><strong>Quick sort</strong><small>divide and conquer</small></button><button class="algo" data-algo="merge"><strong>Merge sort</strong><small>steady and dependable</small></button></div></div><div><hr class="side-divider"><h3>Reading the room</h3><div class="legend"><span><i class="swatch"></i> untouched values</span><span><i class="swatch coral"></i> comparing now</span><span><i class="swatch purple"></i> pivot / focus</span><span><i class="swatch yellow"></i> locked in place</span></div></div><div class="insight-card"><h3>Lab notebook</h3><button class="secondary benchmark-button" id="benchmark-button">Compare all algorithms</button><div class="history-list" id="history-list"><span class="history-empty">Your completed runs will appear here.</span></div></div></aside>
+      </div>
+    </section>
+
+    <section class="view" id="data-view"><div class="data-grid"><article class="data-card"><span class="tag">01 / chaotic</span><h2>Wild random</h2><p>Every value gets a fresh chance to surprise the algorithm. The classic stress test.</p><div class="mini-bars" data-mini="random"></div></article><article class="data-card"><span class="tag">02 / almost there</span><h2>Nearly sorted</h2><p>Most of the work is already done. A great place to see insertion sort shine.</p><div class="mini-bars" data-mini="nearly"></div></article><article class="data-card"><span class="tag">03 / upside down</span><h2>Backwards</h2><p>The worst-case welcome mat for simple methods. Every value needs to change its mind.</p><div class="mini-bars" data-mini="reverse"></div></article><article class="data-card"><span class="tag">04 / high point</span><h2>Mountain range</h2><p>A climb, a peak, and a descent. Structured data can be stranger than random data.</p><div class="mini-bars" data-mini="mountain"></div></article><article class="data-card"><span class="tag">05 / same same</span><h2>Lots of repeats</h2><p>Only a handful of values, repeated across the set. Can your algorithm stay calm?</p><div class="mini-bars" data-mini="duplicates"></div></article><article class="data-card"><span class="tag">06 / your turn</span><h2>Build a challenge</h2><p>Set a pattern, stretch the array, slow the clock down, and make the algorithm earn its ending.</p><button class="secondary" id="gallery-launch">Open the sort lab &rarr;</button></article></div></section>
+
+    <section class="view" id="learn-view"><div class="learn-layout"><section class="learn-panel"><p class="eyebrow">Tiny machine / live training</p><h2>Teach an agent to sort.</h2><p>This learner starts with no idea what to do. Give it a destination, then watch each reward reshape the path it prefers.</p><div class="mission-form"><div><label>Choose five numbers / target order</label><div class="number-picker" id="number-picker" aria-label="Choose five target numbers"></div><div class="selection-count" id="selection-count">0 of 5 selected</div><div class="mission-error" id="mission-error"></div></div><button class="secondary" id="mission-button">Set mission</button><span class="mission-hint" id="mission-hint">Click numbers in the order you want the agent to learn.</span></div><div class="arena"><div class="arena-top"><span id="arena-status">EPISODE 0 / WAITING</span><span id="goal-label">goal: 1 2 3 4 5</span></div><div class="brain-stage"><svg class="network-svg" viewBox="0 0 700 235" preserveAspectRatio="none" aria-label="Neural network activity"><g id="network-lines"></g><g id="network-pulses"></g><g id="network-neurons"></g><g class="network-label"><text x="55" y="220">INPUTS</text><text x="314" y="220">PATTERN</text><text x="594" y="220">MOVES</text></g></svg></div><div class="brain-caption"><span>values enter as signals</span><strong id="brain-message">waiting for a thought...</strong><span>best action exits</span></div><div class="tiles" id="tiles"></div><div class="completion" id="completion"><strong>Mission complete.</strong><span id="completion-copy">The agent reached your target.</span></div></div><div class="learn-actions"><button class="primary" id="train-button">Train for 100 episodes</button><button class="secondary" id="step-button">Single step</button><span class="episode-copy" id="episode-copy">The agent is untrained.</span></div></section><aside class="score-card"><h3>Learning curve</h3><div class="score-number" id="score-number">0%</div><div class="score-label">success rate / last 20 episodes</div><div class="progress"><i id="progress-bar"></i></div><h3>Action confidence</h3><div class="confidence-list" id="confidence-list"></div><h3>Current policy</h3><div class="policy" id="policy"></div><div class="learning-stats"><div class="learning-stat"><strong id="epsilon-value">85%</strong><span>curiosity left</span></div><div class="learning-stat"><strong id="reward-value">0</strong><span>last reward</span></div></div><p class="footnote">Warm lines carry stronger beliefs.</p></aside></div></section>
+
+    <p class="footnote">SORTSCAPE / a small laboratory for big piles of data</p>
+  </main>
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    const bars = $('#bars');
+    const app = { values: [], lastChallenge: [], running: false, paused: false, stopRequested: false, algorithm: 'bubble', pattern: 'random', comparisons: 0, swaps: 0, started: 0, timer: null, episode: 0, wins: [], history: [] };
+    const algorithms = { bubble: 'Bubble sort', insertion: 'Insertion sort', selection: 'Selection sort', quick: 'Quick sort', merge: 'Merge sort' };
+    const speedNames = ['glacial', 'slow', 'steady', 'brisk', 'rapid', 'blitz'];
+    let audioContext = null;
+    let soundOn = true;
+    let lastSoundAt = 0;
+
+    function makeData(pattern, count) {
+      const values = Array.from({ length: count }, (_, index) => index + 1);
+      if (pattern === 'random' || pattern === 'duplicates') {
+        for (let i = values.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [values[i], values[j]] = [values[j], values[i]]; }
+        if (pattern === 'duplicates') return values.map(value => Math.ceil(value / 5) * 5);
+      }
+      if (pattern === 'nearly') { for (let i = 0; i < Math.max(2, Math.floor(count / 7)); i++) { const a = Math.floor(Math.random() * count); const b = Math.floor(Math.random() * count); [values[a], values[b]] = [values[b], values[a]]; } }
+      if (pattern === 'reverse') values.reverse();
+      if (pattern === 'mountain') return values.map((_, index) => index <= count / 2 ? index + 1 : count - index);
+      return values;
+    }
+
+    function renderBars(highlights = [], locked = [], pivot = []) {
+      const max = Math.max(...app.values, 1);
+      bars.innerHTML = app.values.map((value, index) => `<i class="bar ${highlights.includes(index) ? 'active' : ''} ${locked.includes(index) ? 'sorted' : ''} ${pivot.includes(index) ? 'pivot' : ''}" style="height:${Math.max(3, value / max * 100)}%" title="${value}"></i>`).join('');
+      const complete = locked.length === app.values.length;
+      $('#sort-blocks').innerHTML = app.values.map((value, index) => `<div class="sort-block ${highlights.includes(index) ? 'active' : ''} ${locked.includes(index) ? 'sorted' : ''} ${pivot.includes(index) ? 'pivot' : ''} ${complete ? 'complete' : ''}" style="--block-hue:${Math.round(value / max * 300 + 20)}" title="value ${value}">${value}</div>`).join('');
+      const ordered = app.values.reduce((total, value, index) => total + (index === 0 || value >= app.values[index - 1] ? 1 : 0), 0);
+      $('#metric-order').textContent = Math.round(ordered / app.values.length * 100) + '%';
+    }
+
+    function updateMetrics() { $('#metric-comparisons').textContent = app.comparisons; $('#metric-swaps').textContent = app.swaps; $('#metric-time').textContent = ((Date.now() - app.started) / 1000).toFixed(1) + 's'; }
+    function delay() { return [220, 140, 78, 36, 15, 5][Number($('#speed').value)]; }
+    const pause = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    async function waitForRun(ms) { await pause(ms); while (app.paused) await pause(100); if (app.stopRequested) throw new Error('SORT_STOPPED'); }
+    function initAudio() { const AudioConstructor = window.AudioContext || window.webkitAudioContext; if (!AudioConstructor) return; if (!audioContext) audioContext = new AudioConstructor(); if (audioContext.state === 'suspended') audioContext.resume(); }
+    function playSortSound(kind) { if (!soundOn || !audioContext) return; const now = performance.now(); if (kind === 'compare' && now - lastSoundAt < 42) return; lastSoundAt = now; const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain(); oscillator.type = kind === 'swap' ? 'triangle' : 'sine'; oscillator.frequency.value = kind === 'swap' ? 210 + (app.swaps % 7) * 34 : 125 + (app.comparisons % 5) * 18; gain.gain.setValueAtTime(kind === 'swap' ? .045 : .018, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(.001, audioContext.currentTime + (kind === 'swap' ? .12 : .045)); oscillator.connect(gain).connect(audioContext.destination); oscillator.start(); oscillator.stop(audioContext.currentTime + (kind === 'swap' ? .12 : .045)); }
+    function playFinishSound() { if (!soundOn || !audioContext) return; [392, 523, 659].forEach((frequency, index) => { const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain(); oscillator.type = 'sine'; oscillator.frequency.value = frequency; gain.gain.setValueAtTime(.001, audioContext.currentTime + index * .08); gain.gain.linearRampToValueAtTime(.055, audioContext.currentTime + index * .08 + .02); gain.gain.exponentialRampToValueAtTime(.001, audioContext.currentTime + index * .08 + .24); oscillator.connect(gain).connect(audioContext.destination); oscillator.start(audioContext.currentTime + index * .08); oscillator.stop(audioContext.currentTime + index * .08 + .25); }); }
+    async function compare(a, b, highlights = [a, b]) { app.comparisons++; renderBars(highlights); updateMetrics(); playSortSound('compare'); await waitForRun(delay()); return app.values[a] > app.values[b]; }
+    async function swap(a, b) { [app.values[a], app.values[b]] = [app.values[b], app.values[a]]; app.swaps++; renderBars([a, b]); updateMetrics(); playSortSound('swap'); await waitForRun(delay()); }
+
+    async function bubbleSort() { const locked = []; for (let end = app.values.length - 1; end > 0; end--) { let moved = false; for (let i = 0; i < end; i++) { if (await compare(i, i + 1)) { await swap(i, i + 1); moved = true; } } locked.push(end); renderBars([], locked); if (!moved) break; } }
+    async function insertionSort() { const locked = [0]; for (let i = 1; i < app.values.length; i++) { let j = i; while (j > 0 && await compare(j - 1, j)) { await swap(j - 1, j); j--; } locked.push(i); renderBars([], locked); } }
+    async function selectionSort() { const locked = []; for (let start = 0; start < app.values.length - 1; start++) { let min = start; for (let i = start + 1; i < app.values.length; i++) { if (await compare(min, i, [min, i])) min = i; } if (min !== start) await swap(start, min); locked.push(start); renderBars([], locked); } }
+    async function quickSort(left = 0, right = app.values.length - 1) { if (left >= right) return; const pivotValue = app.values[right]; let store = left; for (let i = left; i < right; i++) { app.comparisons++; renderBars([i], [], [right]); updateMetrics(); await waitForRun(delay()); if (app.values[i] < pivotValue) { await swap(i, store); store++; } } await swap(store, right); renderBars([], [], [store]); await quickSort(left, store - 1); await quickSort(store + 1, right); }
+    async function mergeSort(left = 0, right = app.values.length - 1) { if (left >= right) return; const mid = Math.floor((left + right) / 2); await mergeSort(left, mid); await mergeSort(mid + 1, right); const part = app.values.slice(left, right + 1).sort((a, b) => a - b); for (let i = 0; i < part.length; i++) { const target = left + i; if (app.values[target] !== part[i]) { const source = app.values.indexOf(part[i], target); await swap(target, source); } app.comparisons++; renderBars([target]); updateMetrics(); await waitForRun(delay()); } }
+
+    function setRunControls(running) { $('#run-button').disabled = running; $('#pause-button').disabled = !running; $('#reset-button').disabled = running; }
+    function renderHistory() { $('#history-list').innerHTML = app.history.length ? app.history.map(run => `<div class="history-row"><strong>${run.algorithm}</strong><span>${run.time}s / ${run.swaps} moves</span></div>`).join('') : '<span class="history-empty">Your completed runs will appear here.</span>'; }
+    function recordRun() { app.history.unshift({ algorithm: algorithms[app.algorithm], time: ((Date.now() - app.started) / 1000).toFixed(1), swaps: app.swaps }); app.history = app.history.slice(0, 5); renderHistory(); }
+    function benchmarkOne(values, algorithm) {
+      const data = values.slice(); let comparisons = 0; let moves = 0;
+      const swapValues = (a, b) => { [data[a], data[b]] = [data[b], data[a]]; moves++; };
+      if (algorithm === 'bubble') for (let end = data.length - 1; end > 0; end--) for (let i = 0; i < end; i++) { comparisons++; if (data[i] > data[i + 1]) swapValues(i, i + 1); }
+      if (algorithm === 'insertion') for (let i = 1; i < data.length; i++) { let j = i; while (j > 0) { comparisons++; if (data[j - 1] <= data[j]) break; swapValues(j - 1, j); j--; } }
+      if (algorithm === 'selection') for (let start = 0; start < data.length - 1; start++) { let min = start; for (let i = start + 1; i < data.length; i++) { comparisons++; if (data[i] < data[min]) min = i; } if (min !== start) swapValues(start, min); }
+      if (algorithm === 'quick') { const partition = (left, right) => { if (left >= right) return; const pivot = data[right]; let store = left; for (let i = left; i < right; i++) { comparisons++; if (data[i] < pivot) { swapValues(i, store); store++; } } swapValues(store, right); partition(left, store - 1); partition(store + 1, right); }; partition(0, data.length - 1); }
+      if (algorithm === 'merge') { const sorted = data.slice().sort((a, b) => a - b); for (let i = 0; i < data.length; i++) { comparisons++; const source = data.indexOf(sorted[i], i); if (source !== i) swapValues(i, source); } }
+      return { algorithm: algorithms[algorithm], comparisons, moves };
+    }
+    function runBenchmark() { const values = app.lastChallenge.length ? app.lastChallenge.slice() : makeData(app.pattern, Number($('#size').value)); const results = Object.keys(algorithms).map(algorithm => benchmarkOne(values, algorithm)); const maxMoves = Math.max(...results.map(result => result.moves), 1); $('#benchmark-results').innerHTML = results.map(result => `<div class="benchmark-row"><strong>${result.algorithm}</strong><span class="benchmark-track"><i style="width:${Math.max(8, result.moves / maxMoves * 100)}%"></i></span><span>${result.moves} moves</span></div>`).join(''); $('#benchmark-panel').classList.add('show'); }
+    function resetData() { if (app.running) return; app.values = makeData(app.pattern, Number($('#size').value)); app.lastChallenge = app.values.slice(); app.comparisons = 0; app.swaps = 0; app.started = Date.now(); renderBars(); updateMetrics(); $('#run-state').textContent = 'IDLE'; $('#visual-title').textContent = algorithms[app.algorithm] + ' is ready.'; $('#visual-copy').textContent = 'A fresh challenge is waiting.'; }
+    async function runSort() { if (app.running) return; initAudio(); app.running = true; app.paused = false; app.stopRequested = false; setRunControls(true); $('#pause-button').textContent = 'Pause'; $('#run-state').textContent = 'WORKING'; app.comparisons = 0; app.swaps = 0; app.started = Date.now(); app.values = makeData(app.pattern, Number($('#size').value)); app.lastChallenge = app.values.slice(); renderBars(); updateMetrics(); $('#visual-title').textContent = algorithms[app.algorithm] + ' is thinking.'; $('#visual-copy').textContent = 'Listen for the tiny decisions while the blocks find their places.'; try { if (app.algorithm === 'bubble') await bubbleSort(); if (app.algorithm === 'insertion') await insertionSort(); if (app.algorithm === 'selection') await selectionSort(); if (app.algorithm === 'quick') await quickSort(); if (app.algorithm === 'merge') await mergeSort(); } catch (error) { if (error.message !== 'SORT_STOPPED') throw error; } finally { renderBars([], Array.from({ length: app.values.length }, (_, i) => i)); updateMetrics(); playFinishSound(); recordRun(); app.running = false; app.paused = false; setRunControls(false); $('#run-state').textContent = 'COMPLETE'; $('#visual-title').textContent = algorithms[app.algorithm] + ' finished.'; $('#visual-copy').textContent = `${app.comparisons} comparisons, ${app.swaps} moves, and one orderly row.`; } }
+
+    function fillMiniBars() { document.querySelectorAll('[data-mini]').forEach((box) => { const data = makeData(box.dataset.mini, 17); box.innerHTML = data.map(value => `<i style="height:${Math.max(14, value / Math.max(...data) * 100)}%"></i>`).join(''); }); }
+    function renderTiles(values, hot = []) { $('#tiles').innerHTML = values.map((value, index) => `<div class="tile ${hot.includes(index) ? 'hot' : ''}">${value}</div>`).join(''); }
+    let target = [1, 2, 3, 4, 5];
+    const network = { inputs: [[90, 68], [90, 104], [90, 140], [90, 176]], hidden: [[350, 68], [350, 104], [350, 140], [350, 176]], outputs: [[610, 68], [610, 104], [610, 140], [610, 176]] };
+    const rankOf = value => target.indexOf(value);
+    const mistakesFor = values => values.reduce((count, value, index) => count + (index && rankOf(values[index - 1]) > rankOf(value) ? 1 : 0), 0);
+    const isMissionComplete = () => learner.values.every((value, index) => value === target[index]);
+    const selectedNumbers = [];
+    function renderNumberPicker() { $('#number-picker').innerHTML = Array.from({ length: 9 }, (_, index) => index + 1).map(value => `<button type="button" class="number-choice ${selectedNumbers.includes(value) ? 'selected' : ''}" data-number="${value}" aria-pressed="${selectedNumbers.includes(value)}">${value}</button>`).join(''); $('#selection-count').textContent = `${selectedNumbers.length} of 5 selected${selectedNumbers.length ? ' / ' + selectedNumbers.join('  ') : ''}`; }
+    function chooseNumber(value) { const position = selectedNumbers.indexOf(value); if (position >= 0) selectedNumbers.splice(position, 1); else if (selectedNumbers.length < 5) selectedNumbers.push(value); renderNumberPicker(); }
+    function shuffleMission() { learner.values = target.slice().reverse(); if (isMissionComplete()) learner.values = target.slice(1).concat(target[0]); }
+    function resetMission() { learner.q = Array.from({ length: 4 }, () => Math.random() * .2); learner.epsilon = .85; learner.lastReward = 0; learner.completed = false; app.episode = 0; app.wins = []; shuffleMission(); $('#goal-label').textContent = 'goal: ' + target.join(' '); $('#completion').classList.remove('show'); $('#episode-copy').textContent = 'Mission loaded. The agent is untrained.'; renderTiles(learner.values); renderNetwork(); updateLearnerUI(); }
+    function renderNetwork(action = 0, reward = 0) {
+      const lines = $('#network-lines');
+      if (!lines.childElementCount) {
+        lines.innerHTML = network.inputs.flatMap((from, fromIndex) => network.hidden.map((to, toIndex) => `<line class="network-line" id="line-i${fromIndex}-h${toIndex}" x1="${from[0]}" y1="${from[1]}" x2="${to[0]}" y2="${to[1]}"/>`)).concat(network.hidden.flatMap((from, fromIndex) => network.outputs.map((to, toIndex) => `<line class="network-line" id="line-h${fromIndex}-o${toIndex}" x1="${from[0]}" y1="${from[1]}" x2="${to[0]}" y2="${to[1]}"/>`))).join('');
+        $('#network-neurons').innerHTML = network.inputs.map((point, index) => `<circle class="neuron" id="neuron-i${index}" cx="${point[0]}" cy="${point[1]}" r="12"/>`).concat(network.hidden.map((point, index) => `<circle class="neuron" id="neuron-h${index}" cx="${point[0]}" cy="${point[1]}" r="16"/>`)).concat(network.outputs.map((point, index) => `<circle class="neuron" id="neuron-o${index}" cx="${point[0]}" cy="${point[1]}" r="14"/>`)).join('');
+      }
+      const disorder = learner.values.slice(0, 4).map((value, index) => Math.min(1, Math.max(0, rankOf(value) - rankOf(learner.values[index + 1])) / 4));
+      const hidden = disorder.map((value, index) => Math.min(1, value * .7 + Math.abs(learner.q[index]) / 8));
+      document.querySelectorAll('.neuron').forEach(node => node.classList.remove('hot', 'goal'));
+      disorder.forEach((value, index) => { if (value > .12) $(`#neuron-i${index}`).classList.add('hot'); });
+      hidden.forEach((value, index) => { if (value > .12) $(`#neuron-h${index}`).classList.add('hot'); });
+      $(`#neuron-o${action}`).classList.add(reward > 0 ? 'goal' : 'hot');
+      document.querySelectorAll('.network-line').forEach(line => line.classList.remove('lit', 'good'));
+      hidden.forEach((value, index) => { if (value > .12) { $(`#line-i${index}-h${index}`).classList.add('lit'); $(`#line-h${index}-o${action}`).classList.add('lit'); } });
+    }
+    const learner = { values: [4, 1, 5, 2, 3], q: Array.from({ length: 4 }, () => Math.random() * .2), epsilon: .85, lastReward: 0, completed: false };
+    function bestMove() { return learner.q.indexOf(Math.max(...learner.q)); }
+    function learnerStep(forcedAction = null) { if (learner.completed) return true; const action = forcedAction === null ? (Math.random() < learner.epsilon ? Math.floor(Math.random() * 4) : bestMove()) : forcedAction; const before = mistakesFor(learner.values); if (rankOf(learner.values[action]) > rankOf(learner.values[action + 1])) [learner.values[action], learner.values[action + 1]] = [learner.values[action + 1], learner.values[action]]; const after = mistakesFor(learner.values); const reward = isMissionComplete() ? 10 : after < before ? 1 : -.4; learner.lastReward = reward; learner.q[action] += .18 * (reward - learner.q[action]); const won = isMissionComplete(); if (won) { app.wins.push(1); learner.completed = true; } else app.wins.push(0); app.wins = app.wins.slice(-20); learner.epsilon = Math.max(.08, learner.epsilon * .992); app.episode++; renderTiles(learner.values, [action, action + 1]); renderNetwork(action, reward); updateLearnerUI(won, action); return won; }
+    function findImprovingAction() { const before = mistakesFor(learner.values); for (let action = 0; action < 4; action++) { const values = learner.values.slice(); if (rankOf(values[action]) > rankOf(values[action + 1])) [values[action], values[action + 1]] = [values[action + 1], values[action]]; if (mistakesFor(values) < before) return action; } return bestMove(); }
+    function updateLearnerUI(won = learner.completed, action = 0) { const rate = app.wins.length ? Math.round(app.wins.reduce((a, b) => a + b, 0) / app.wins.length * 100) : 0; const maxQ = Math.max(...learner.q, .1); $('#score-number').textContent = rate + '%'; $('#progress-bar').style.width = rate + '%'; $('#arena-status').textContent = `EPISODE ${app.episode} / ${won ? 'MISSION COMPLETE' : 'EXPLORING'}`; $('#episode-copy').textContent = won ? 'The agent learned the route and reached your exact target.' : `It tried swap ${action + 1}; the network is adjusting.`; $('#brain-message').textContent = won ? 'reward signal: target reached!' : learner.lastReward > 0 ? 'useful move: belief reinforced' : 'surprise: exploring another path'; $('#epsilon-value').textContent = Math.round(learner.epsilon * 100) + '%'; $('#reward-value').textContent = learner.lastReward > 0 ? '+' + learner.lastReward : learner.lastReward; $('#completion').classList.toggle('show', learner.completed); $('#completion-copy').textContent = `Reached ${target.join(' ')} in ${app.episode} episodes.`; $('#confidence-list').innerHTML = learner.q.map((value, index) => `<div class="confidence-row"><span>swap ${index + 1}</span><span class="confidence-track"><i style="width:${Math.max(8, Math.min(100, value / maxQ * 100))}%;background:${index === bestMove() ? 'var(--coral)' : 'var(--teal)'}"></i></span><b>${Math.round(value * 10) / 10}</b></div>`).join(''); $('#policy').innerHTML = learner.q.map((value, index) => `<i style="opacity:${Math.min(1, .35 + Math.abs(value) / 5)}">${index + 1} &rarr; ${Math.round(value * 10) / 10}</i>`).join(''); }
+    async function train() { $('#train-button').disabled = true; for (let i = 0; i < 100 && !learner.completed; i++) { learnerStep(); await pause(18); } let safety = 0; while (!learner.completed && safety < 20) { learnerStep(findImprovingAction()); safety++; await pause(28); } $('#train-button').disabled = false; }
+
+    document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => { document.querySelectorAll('.tab').forEach(item => item.classList.remove('active')); document.querySelectorAll('.view').forEach(view => view.classList.remove('active')); tab.classList.add('active'); $('#' + tab.dataset.view + '-view').classList.add('active'); }));
+    document.querySelectorAll('.algo').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('.algo').forEach(item => item.classList.remove('selected')); button.classList.add('selected'); app.algorithm = button.dataset.algo; $('#sort-select').value = app.algorithm; $('#visual-title').textContent = algorithms[app.algorithm] + ' is ready.'; }));
+    $('#sort-select').addEventListener('change', event => { app.algorithm = event.target.value; document.querySelector(`[data-algo="${app.algorithm}"]`).click(); });
+    $('#pattern').addEventListener('change', event => { app.pattern = event.target.value; app.values = makeData(app.pattern, Number($('#size').value)); renderBars(); });
+    $('#size').addEventListener('input', event => { $('#size-output').textContent = event.target.value + ' values'; if (!app.running) { app.values = makeData(app.pattern, Number(event.target.value)); renderBars(); } });
+    $('#speed').addEventListener('input', event => { $('#speed-output').textContent = speedNames[event.target.value]; });
+    $('#run-button').addEventListener('click', runSort);
+    $('#pause-button').addEventListener('click', () => { if (!app.running) return; app.paused = !app.paused; $('#pause-button').textContent = app.paused ? 'Resume' : 'Pause'; $('#run-state').textContent = app.paused ? 'PAUSED' : 'WORKING'; });
+    $('#reset-button').addEventListener('click', resetData);
+    $('#sound-button').addEventListener('click', () => { soundOn = !soundOn; $('#sound-button').textContent = soundOn ? 'Sound on' : 'Sound off'; $('#sound-button').setAttribute('aria-pressed', soundOn); if (soundOn) initAudio(); });
+    $('#benchmark-button').addEventListener('click', runBenchmark);
+    $('#gallery-launch').addEventListener('click', () => document.querySelector('[data-view="sort"]').click());
+    $('#number-picker').addEventListener('click', event => { const button = event.target.closest('[data-number]'); if (button) chooseNumber(Number(button.dataset.number)); });
+    $('#mission-button').addEventListener('click', () => { if (selectedNumbers.length !== 5) { $('#mission-error').textContent = 'Choose exactly five numbers before setting the mission.'; return; } target = selectedNumbers.slice(); $('#mission-error').textContent = ''; resetMission(); });
+    $('#step-button').addEventListener('click', learnerStep); $('#train-button').addEventListener('click', train);
+    app.values = makeData(app.pattern, Number($('#size').value)); renderBars(); fillMiniBars(); renderTiles(learner.values); renderNetwork(); updateLearnerUI(); selectedNumbers.push(...target); renderNumberPicker(); renderHistory(); $('#speed-output').textContent = speedNames[$('#speed').value];
+  </script>
+</body>
+</html>
